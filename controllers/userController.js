@@ -69,5 +69,18 @@ module.exports = {
         }
     },
 
-    async deleteUser
-}
+    async deleteUser({ params }, res) {
+        try {
+            const dbUserData = await User.findOneAndDelete({ _id: params.id });
+
+            if (!dbUserData) {
+                return res.status(404),json({ message: "No user with this id"});
+            }
+
+            await Thought.deleteMany({ _id: { $in: dbUserData.thoughts } });
+            res.json({ message: "User and thoughts deleted"});
+        } catch (err) {
+          res.json(err);
+        }
+    },
+};
