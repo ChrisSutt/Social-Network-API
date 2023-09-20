@@ -1,15 +1,57 @@
 const { User, Thought } = require("../models");
 
-const userController {
-    // get users
+module.exports = {
 
-    // get users by id
+    async getAllUser(req, res) {
+        try {
+            const dbUserData = await User.find({})
+            .populate({
+                path: "friends",
+                select: "-__v",
+            })
+            .select("-__v")
+            .sort({ _id: -1 });
+            res.json(dbUserData);
+        } catch (err) {
+            console.error(err);
+            res.sendStatus(400);
+        }
+    },
 
-    // create user
+    async getUserById({ params }, res) {
+        try {
+            const dbUserData = await User.findOne({ _id: params.id })
+            .populate({
+                path: "thoughts",
+                select: "-__v",
+            })
+            .populate({
+                path: "friends",
+                select: "-__v",
+            })
+            .select("-__V");
 
-    // update user by id
+            if (!dbUserData) {
+                return res.status(404.).json({ message: "No user found with this ID"});
+            }
 
-    
-};
+            res.json(dbUserData);
+        } catch (err) {
+            console.error(err);
+            res.sendStatus(400);
+        }
+    },
 
-module.exports = userController;
+    async createtUser({ body }, res) {
+        try {
+            const dbUserData = await User.create(body);
+            res.json(dbUserData);
+        } catch (err) {
+            res.json(err);
+        }
+    },
+
+    async updateUser
+
+    async deleteUser
+}
