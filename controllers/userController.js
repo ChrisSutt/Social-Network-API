@@ -51,7 +51,23 @@ module.exports = {
         }
     },
 
-    async updateUser
+    async updateUser({ params, body }, res) {
+        try {
+            const dbUserData = await User.findOneAndUpdate(
+                { _id: params.id },
+                body,
+                { new: true, runValidators: true}
+            );
+
+            if (!dbUserData) {
+                return res.status(404).json({ message: "No user found with this Id"});
+            }
+
+            res.json(dbUserData);
+        } catch (err) {
+            res.json(err);
+        }
+    },
 
     async deleteUser
 }
