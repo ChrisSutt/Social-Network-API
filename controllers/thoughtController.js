@@ -27,7 +27,6 @@ module.exports = {
             res.status(500).json(err);
         }
     }
-},
 
     async createThought(req,res) {
         try {
@@ -68,5 +67,25 @@ module.exports = {
         }
     },
 
-    async deleteThought
+    async deleteThought(req, res) {
+        try {
+            const deletedThought = await Thought.findOneAndDelete({ _id: req.params.thoughtId });
+
+            if (!deletedThought) {
+                return res.status(404).json ({ message: "No thought found with this Id" }); 
+            }
+
+            const deletedThoughtId = deletedThought._id;
+            const updatedUser = await User.findOneAndUpdate(
+                { thought: deletedThoughtId },
+                { $pull: { thopughts: deletedThoughtId }},
+                { new: true }
+            );
+
+            if (!updatedUser) {
+                console.error({ message: err });
+                res.status(500).json(err);
+            }
+        },
+    }
 
