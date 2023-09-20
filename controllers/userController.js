@@ -42,7 +42,7 @@ module.exports = {
         }
     },
 
-    async createtUser({ body }, res) {
+    async createUser({ body }, res) {
         try {
             const dbUserData = await User.create(body);
             res.json(dbUserData);
