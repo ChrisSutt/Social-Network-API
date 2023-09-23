@@ -54,24 +54,27 @@ module.exports = {
         }
     },
 
-    async updateThought(req, res) {
+    async updateThought({ params, body }, res) {
         try {
-            const updatedThought = await Thought.findOneAndUpdate(
-                { _id: req.params.thoughtId },
-                req.body,
-                { new: true, runValidators: true }
-            );
-
-            if (!updatedThought) {
-                return res.status(404).json({ message: "No thought found" });
+          const dbThoughtData = await Thought.findOneAndUpdate(
+            { _id: params.id },
+            body,
+            {
+              new: true,
+              runValidators: true,
             }
-
-            res.json(updatedThought);
+          );
+      
+          if (!dbThoughtData) {
+            res.status(404).json({ message: "No thought found with this id" });
+            return;
+          }
+      
+          res.json(dbThoughtData);
         } catch (err) {
-            console.error({ message: err });
-            res.status(500).json(err);
+          res.json(err);
         }
-    },
+      },
 
     async deleteThought(req, res) {
         try {
