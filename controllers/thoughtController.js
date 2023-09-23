@@ -1,4 +1,5 @@
-const { Thought, User } = require("../models");
+const Thought = require("../models/Thought");
+const User = require("../models/User");
 
 module.exports = {
     async getThoughts(req, res) {
@@ -13,20 +14,25 @@ module.exports = {
         }
     },
     
-    async getThoughtById(req, res) {
+    async getThoughtById({ params }, res) {
         try {
-            const thought = await Thought.findOne({ _id: req.params.postId })
-            .populate({ path: "reactions", select: '-__v'});
-
-            if (!thought) {
-                return res.status(400).json({ message: 'No post with that ID' });
-            }
-
-            res.json(thought);
+          const dbThoughtData = await Thought.findOne({ _id: params.id })
+            .populate({
+              path: "reactions",
+              select: "-__v",
+            })
+            .select("-__v");
+      
+          if (!dbThoughtData) {
+            return res.status(404).json({ message: "No thought with this id" });
+          }
+      
+          res.json(dbThoughtData);
         } catch (err) {
-            res.status(500).json(err);
+          console.error(err);
+          res.sendStatus(400);
         }
-    },
+      },
 
     async createThought(req, res) {
         try {
