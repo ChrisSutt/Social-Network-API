@@ -76,31 +76,32 @@ module.exports = {
         }
       },
 
-    async deleteThought(req, res) {
+      async deleteThought({ params }, res) {
         try {
-            const deletedThought = await Thought.findOneAndDelete({ _id: req.params.thoughtId });
-
-            if (!deletedThought) {
-                return res.status(404).json({ message: "No thought found with this Id" }); 
-            }
-
-            const deletedThoughtId = deletedThought._id;
-            const updatedUser = await User.findOneAndUpdate(
-                { thoughts: deletedThoughtId },
-                { $pull: { thoughts: deletedThoughtId }},
-                { new: true }
-            );
-
-            if (!updatedUser) {
-                console.error({ message: 'User not found!' });
-                res.status(500).json({ message: 'User not found!' });
-            }
+          const dbThoughtData = await Thought.findOneAndDelete({ _id: params.id });
+      
+          if (!dbThoughtData) {
+            return res.status(404).json({ message: "No thought with this id" });
+          }
+      
+          const dbUserData = await User.findOneAndUpdate(
+            { thoughts: params.id },
+            { $pull: { thoughts: params.id } },
+            { new: true }
+          );
+      
+          if (!dbUserData) {
+            return res
+              .status(404)
+              .json({ message: "Thought created but no user with this id" });
+          }
+      
+          res.json({ message: "Thought successfully delete" });
         } catch (err) {
-            console.error({ message: err });
-            res.status(500).json(err);
+          res.json(err);
         }
-    },
-
+      },
+      
     async addReaction(req, res) {
         try {
             const updatedThought = await Thought.findOneAndUpdate(
